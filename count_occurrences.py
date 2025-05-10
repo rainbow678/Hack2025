@@ -13,8 +13,11 @@ def count_occurrences(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
             
-            # Dictionary to store counts per person
-            counts = defaultdict(lambda: {'אלצ': 0, 'אלץ': 0})
+            # Dictionary to store counts and occurrences per person
+            counts = defaultdict(lambda: {
+                'אלצ': {'count': 0, 'occurrences': []},
+                'אלץ': {'count': 0, 'occurrences': []}
+            })
             
             # Regular expression to match the WhatsApp message format
             # This pattern matches: date, time - name: message
@@ -24,27 +27,42 @@ def count_occurrences(file_path):
             messages = re.finditer(pattern, content, re.DOTALL)
             
             for match in messages:
+                date = match.group(1)
+                time = match.group(2)
                 name = match.group(3).strip()
                 message = match.group(4)
                 
                 # Count occurrences in this message
-                counts[name]['אלצ'] += message.count('אלצ')
-                counts[name]['אלץ'] += message.count('אלץ')
+                if 'אלצ' in message:
+                    counts[name]['אלצ']['count'] += message.count('אלצ')
+                    counts[name]['אלצ']['occurrences'].append(f"{date} {time}")
+                if 'אלץ' in message:
+                    counts[name]['אלץ']['count'] += message.count('אלץ')
+                    counts[name]['אלץ']['occurrences'].append(f"{date} {time}")
             
             # Print results to console
             print("Occurrences per person:")
             print("=" * 40)
             for name in sorted(counts.keys()):
-                counts_dict = counts[name]
-                total = counts_dict['אלצ'] + counts_dict['אלץ']
+                total = counts[name]['אלצ']['count'] + counts[name]['אלץ']['count']
                 if total > 0:
-                    print(f"{name}:")
-                    print(f"  'אלצ': {counts_dict['אלצ']}")
-                    print(f"  'אלץ': {counts_dict['אלץ']}")
-                    print(f"  Total: {total}\n")
-            total_alts = sum(counts[name]['אלצ'] for name in counts)
-            total_altz = sum(counts[name]['אלץ'] for name in counts)
-            print("Overall totals:")
+                    print(f"\n{name}:")
+                    if counts[name]['אלצ']['count'] > 0:
+                        print(f"  'אלצ': {counts[name]['אלצ']['count']}")
+                        print("  Occurred at:")
+                        for occurrence in counts[name]['אלצ']['occurrences']:
+                            print(f"    - {occurrence}")
+                    if counts[name]['אלץ']['count'] > 0:
+                        print(f"  'אלץ': {counts[name]['אלץ']['count']}")
+                        print("  Occurred at:")
+                        for occurrence in counts[name]['אלץ']['occurrences']:
+                            print(f"    - {occurrence}")
+                    print(f"  Total: {total}")
+            
+            # Print overall totals
+            total_alts = sum(counts[name]['אלצ']['count'] for name in counts)
+            total_altz = sum(counts[name]['אלץ']['count'] for name in counts)
+            print("\nOverall totals:")
             print("=" * 40)
             print(f"  'אלצ': {total_alts}")
             print(f"  'אלץ': {total_altz}")
