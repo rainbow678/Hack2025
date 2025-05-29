@@ -9,3 +9,7 @@ pip install -r requirements.txt
 Then run the script by providing a text file as input:
 
 python translate_file.py your_text_file.txt
+
+----------------- 
+
+python count_occurrences.py "D:\Mine\Hackathon\WhatsApp Chat with Dan.txt"
